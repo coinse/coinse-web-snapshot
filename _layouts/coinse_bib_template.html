@@ -1,0 +1,13 @@
+---
+---
+
+{{ reference }}
+{% if links.pdf %}
+[<a class="ref-tag" href="{{ links.pdf }}" target="_blank">pdf</a>]
+{% endif %}
+{% if entry.bibtex %}
+[<a class="ref-tag bibtex" id="{{ key }}">bibtex</a>]
+<pre class="bibtex-raw prettyprint" id="raw-{{ key }}">
+  {{ entry.bibtex }}
+</pre>
+{% endif %}

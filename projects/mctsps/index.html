@@ -1,0 +1,140 @@
+---
+layout: page
+title: "Field Report: Applying Monte Carlo Tree Search for Program Synthesis"
+---
+
+<p>
+This page is supplementary to the paper entitled "Field Report: Applying Monte Carlo Tree Search for Program Synthesis" (pdf <a href="mcts.pdf">here</a>), submitted to <a href="http://ssbse.org/2016">International Symposium on Search-Based Software Engineering 2016</a>. This page contains additional details and results that could not be reported in the paper due to page limits. The data used in the paper is also made available here to enable replication and further research on the topic.
+</p>
+<br/>
+<h3>Abstract</h3>
+<p>
+	Program synthesis aims to automatically generate an executable segment of code that satisfies a given set of criteria. Genetic programming has been widely studied for program synthesis. However,	it has drawbacks such as code bloats and the difficulty in finer controlover the growth of programs. This paper explores the possibility of applying Monte Carlo Tree Search (MCTS) technique to general purpose program synthesis. The exploratory study applies MCTS to synthesis of six small benchmarks using Java Bytecode instructions, and compares the results to those of genetic programming. The paper discusses the major challenges and outlines the future work.
+</p>
+<br/>
+<h3>Monte Carlo Tree Search (MCTS)</h3>
+<p>
+Monte Carlo Tree Search (MCTS) is a method of finding an optimal decision in a given domain by taking random samples in the state space and building a search tree according to the results [1]. It is ideally suited to problems for which the value of an action cannot be assessed directly, but can only be estimated by the values of sequences of actions that follow (called playouts). The intuition is that if an action <i>A</i> is better than an action <i>B</i>, then the playouts following <i>A</i> will yield higher rewards than those following <i>B</i>.</p>
+
+<p>
+The exploration of the search space is stored in a search tree, which consists of states (represented by the nodes) and actions (represented by the edges). Figure 1 shows the high-level overview of how MCTS grows the search tree. First, starting from the root node, it recursively selects a child node by considering two statistics: the history of rewards gained by selecting this node and the number of times it was selected (<strong>Selection</strong>). The algorithm descends through the tree until it reaches a node with an unvisited child, at which point a child node is expanded (<strong>Expansion</strong>). Second, starting from the expanded node, the algorithm samples subsequent moves (i.e. actions and consequent nodes) until it reaches a terminal state (<strong>Sampling</strong>). The sequence of actions thus far is evaluated to produce a reward. Finally, it ascends through the tree to update the statistics of each visited node (<strong>Backpropagation</strong>). This is repeated until the computational budget runs out.
+</p>
+
+<p><img src="plots/mcts-outline.png"/></p>
+
+<p>The performance of MCTS relies heavily on selecting a <i>good</i> child node (i.e. one that will eventually yield high reward) in the Tree Policy step. Upper Confidence Bounds for Tree (UCT) [2] is a variant of MCTS that provides a heuristic for child selection: it chooses a child node that maximizes the following Upper Confidence Bounds (UCB) [3]: </p>
+
+<p><img src="plots/formula.png" style="width: 200px"/></p>
+
+<p>in which <i>S<sub>c</sub></i> is the sum of rewards for the child, <i>n<sub>c</sub></i> and <i>n<sub>p</sub></i> the number of times the child and its parent nodes have been visited, and <i>K</i> is a parameter that tunes the exploration-exploitation balance. </p>
+
+<p>MCTS has been widely studied in the context of games [4, 5, 6, 7]. Recently, White et al. applied MCTS for symbolic regression, giving results competitive with those of genetic programming [13]. In this work, we aim to evaluate its application as a constructive heuristic for automated programming, traditionally an application domain of genetic programming [8, 9, 10, 11, 12]. We explain our methodology, evaluate it on six small benchmarks, and show that MCTS performs comparably to GP.</p>
+
+<br/>
+<h3>Instruction Set</h3>
+<p>
+	This section gives the detailed description of our instruction set.
+</p>
+<p><a href="#plot01" class="inline">Instructions</a></p>
+
+<br/>
+<h3>Benchmarks</h3>
+<p>
+	The following table, taken from the paper <a href="http://dl.acm.org/citation.cfm?id=2754769">General Program Synthesis Benchmark Suite,</a> gives a detailed description of the benchmarks used.
+</p>
+<p><a href="#benchmarks" class="inline">Benchmarks</a></p>
+
+<br/>
+<h3>Results</h3>
+<p>
+	The following gives the boxplots, raw results and best-fitness programs produced by UCT and GP on each of the six benchmarks.
+</p>
+<p><a href="#results" class="inline">Boxplots, Results and Best-fitness Programs</a></p>
+
+<div style="display: none">
+	<div id="plot01" class="formula">
+		<h2>Instructions</h2>
+		<div class="tabs">
+			<ul>
+				<li><a href="#table_instructions">Table</a></li>
+			</ul>
+			<div id="table_instructions" class="scatterplots">
+				<p><img src="plots/table_instructions.png"/></p>
+			</div>
+		</div>
+	</div>
+	<div id="benchmarks" class="formula">
+		<h2>Benchmarks</h2>
+		<div class="tabs">
+			<ul>
+				<li><a href="#table_benchmarks">Table</a></li>
+			</ul>
+			<div id="table_benchmarks" class="scatterplots">
+				<p><img src="plots/benchmarks.png"/></p>
+			</div>
+		</div>
+	</div>
+	<div id="results" class="formula">
+		<h2>Results</h2>
+		<div class="tabs">
+			<ul>
+				<li><a href="#boxplots_training">Results on the Training Set</a></li>
+				<li><a href="#boxplots_test">Results on the Test Set</a></li>
+				<li><a href="#raw_dataset">Raw Dataset</a></li>
+				<li><a href="#best_programs">Best-fitness Programs</a></li>
+			</ul>
+			<div id="boxplots_training" class="scatterplots">
+				<p><img src="plots/plot_train_ADD_INTEGER_AND_FLOAT%20(TRAIN).png"/></p>
+				<p><img src="plots/plot_train_SMALL_OR_LARGE%20(TRAIN).png"/></p>
+				<p><img src="plots/plot_train_COMPARE_STRING_LENGTHS%20(TRAIN).png"/></p>
+				<p><img src="plots/plot_train_GRADE%20(TRAIN).png"/></p>
+				<p><img src="plots/plot_train_MEDIAN%20(TRAIN).png"/></p>
+				<p><img src="plots/plot_train_SMALLEST%20(TRAIN).png"/></p>
+			</div>
+			<div id="boxplots_test" class="scatterplots">
+				<p><img src="plots/plot_test_ADD_INTEGER_AND_FLOAT%20(TEST).png"/></p>
+				<p><img src="plots/plot_test_SMALL_OR_LARGE%20(TEST).png"/></p>
+				<p><img src="plots/plot_test_COMPARE_STRING_LENGTHS%20(TEST).png"/></p>
+				<p><img src="plots/plot_test_GRADE%20(TEST).png"/></p>
+				<p><img src="plots/plot_test_MEDIAN%20(TEST).png"/></p>
+				<p><img src="plots/plot_test_SMALLEST%20(TEST).png"/></p>
+			</div>
+			<div id="raw_dataset" class="table">
+				<p><a href="plots/gp.csv">GP results</a></p>
+				<p><a href="plots/uct.csv">UCT results</a></p>
+				<p><a href="plots/statistics.csv">Statistics</a></p>
+			</div>
+			<div id="best_programs" class="scatterplots">
+				<p><img src="plots/program1.png"/></p>
+				<p><img src="plots/program2.png"/></p>
+				<p><img src="plots/program3.png"/></p>
+				<p><img src="plots/program4.png"/></p>
+				<p><img src="plots/program5.png"/></p>
+				<p><img src="plots/program6.png"/></p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br/>
+<h3>References</h3>
+<p>[1] Browne, C.B., Powley, E., Whitehouse, D., Lucas, S.M., Cowling, P.I., Rohlfshagen, P., Tavener, S., Perez, D., Samothrakis, S., Colton, S.: A survey of monte carlo tree search methods. IEEE Transactions on Computational Intelligence and AI in Games 4(1), 1–43 (2012)</p>
+<p>[2] Kocsis, L., Szepesvári, C.: Bandit based monte-carlo planning. In: Machine Learning: ECML 2006, pp. 282–293. Springer (2006)</p>
+<p>[3] Auer, P.: Using confidence bounds for exploitation-exploration trade-offs. The Journal of Machine Learning Research 3, 397–422 (2003)</p>
+<p>[4] Silver, D., Huang, A., Maddison, C.J., Guez, A., Sifre, L., Van Den Driessche, G., Schrittwieser, J., Antonoglou, I., Panneershelvam, V., Lanctot, M., et al.: Mastering the game of go with deep neural networks and tree search. Nature 529(7587), 484–489 (2016)</p>
+<p>[5] Winands, M.H., Björnsson, Y., Saito, J.T.: Monte-carlo tree search solver. In: International Conference on Computers and Games. pp. 25–36. Springer (2008)</p>
+<p>[6] Ciancarini, P., Favini, G.P.: Monte carlo tree search in kriegspiel. Artificial Intelligence 174(11), 670–684 (2010)</p>
+<p>[7] Cazenave, T.: Nested monte-carlo search. In: IJCAI. vol. 9, pp. 456–461 (2009)</p>
+<p>[8] Helmuth, T.: General Program Synthesis from Examples Using Genetic Programming with Parent Selection Based on Random Lexicographic Orderings of Test Cases. Ph.D. thesis, University of Massachuses-Amherst (2015)</p>
+<p>[9] Helmuth, T., Spector, L.: General program synthesis benchmark suite. In: Proceedings of the 2015 Annual Conference on Genetic and Evolutionary Computation. pp. 1039–1046. GECCO ’15, ACM, New York, NY, USA (2015)</p>
+<p>[10] Arcuri, A., Yao, X.: Coevolving programs and unit tests from their specification. In: Proceedings of the twenty-second IEEE/ACM international conference on Automated software engineering. pp. 397–400. ACM (2007)</p>
+<p>[11] Arcuri, A., Yao, X.: Co-evolutionary automatic programming for software development. Information Sciences 259, 412–432 (2014)</p>
+<p>[12] Forrest, S., Nguyen, T., Weimer, W., Le Goues, C.: A genetic programming approach to automated software repair. In: Proceedings of the 11th Annual Conference on Genetic and Evolutionary Computation. pp. 947–954 (2009)</p>
+<p>[13] White, David R., Shin Yoo, Jeremy Singer: The Programming Game: Evaluating MCTS as an Alternative to GP for Symbolic Regression. In: Proceedings of the Companion Publication of the 2015 Annual Conference on Genetic and Evolutionary Computation. ACM (2015)</p>
+
+
+
+
+
+
+

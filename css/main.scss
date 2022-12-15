@@ -1,0 +1,119 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+@charset "utf-8";
+
+
+
+// Our variables
+$base-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$base-font-size:   14px;
+$base-font-weight: 400;
+$small-font-size:  $base-font-size * 0.875;
+$base-line-height: 1.5;
+
+$spacing-unit:     20px;
+
+$text-color:       #111;
+$background-color: #fdfdfd;
+$brand-color:      #45bcf1;
+$link-color:       #0366d6;
+
+$grey-color:       #828282;
+$grey-color-light: lighten($grey-color, 40%);
+$grey-color-dark:  darken($grey-color, 25%);
+
+// Width of the content area
+$content-width:    800px;
+
+$on-palm:          600px;
+$on-laptop:        800px;
+
+
+
+// Use media queries like this:
+// @include media-query($on-palm) {
+//     .wrapper {
+//         padding-right: $spacing-unit / 2;
+//         padding-left: $spacing-unit / 2;
+//     }
+// }
+@mixin media-query($device) {
+    @media screen and (max-width: $device) {
+        @content;
+    }
+}
+
+
+
+// Import partials from `sass_dir` (defaults to `_sass`)
+@import
+        "base",
+        "layout",
+        "syntax-highlighting"
+;
+
+
+.member-img {
+    max-height: 200px;   
+}
+
+.image_off, #image-box:hover .image_on {
+    display:none;
+    animation: shake 1s;
+    /* When the animation is finished, start again */
+    animation-iteration-count: infinite;
+}
+.image_on, #image-box:hover .image_off {
+    display:block
+}
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.description a {
+    word-wrap: break-word;
+}
+
+.gradient {
+    background: linear-gradient(90deg, rgba(69,188,241,0.3) 0%, rgba(254,241,81,0.3) 100%);
+    /* background: white; */
+
+}
+.interview-ad {
+    padding: 10px;
+    /* border-style: double; */
+    /* border-color: rgba(244,1,1,0.5); */
+    /* border-width: 6px; */
+    /* border-width: 2px; */
+    text-align: center;
+    font-size: 1.2em;
+    line-height: 2.5;
+}
+.apply-btn {
+display: inline-block;
+font-weight: 400;
+color: #fff;
+text-align: center;
+border: 1px solid transparent;
+padding: .375rem .75rem;
+font-size: 1em;
+line-height: 1.5;
+border-radius: .25rem;
+background-color: #45bcf1;
+/* background-color: rgba(244,1,1,0.5) */
+}
+.apply-btn:hover {
+    background-color: #0092ef;
+}

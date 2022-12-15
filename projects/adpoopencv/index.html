@@ -1,0 +1,466 @@
+---
+layout: page
+title: Amortised Deep Parameter Optimisation of GPGPU Work Group Size for OpenCV 
+---
+
+		<p>
+			This page is supplementary to the paper entitled "Amortised Deep Parameter Optimisation of GPGPU Work Group Size for OpenCV", which has been presented at the <a href="http://ssbse.org/2016">International Symposium on Search-Based Software Engineering 2016</a>. This page contains additional results that could not be reported in the paper due to page limits. The data used in the paper is also made available here to enable replication and further research on the topic.
+		</p>
+		<h3>Background</h3>
+		<p>
+			General purpose computing on graphics processing units, also known as GPGPU, enables massive parallelism by taking advantage of the Single Instruction Multiple Data (SIMD) architecture of the large number of cores found on modern graphics cards. A parameter critical to the performance of a GPGPU application is the local work group size, which controls how many work items are executed on a single compute unit. The ideal value minimises the memory access time by sharing (the slowest) access to the same area of global memory. While GPGPU vendors suggest default work group sizes based on generic benchmarks, finding the optimal local work group size for a given computation essentially remains as a trial-and-error task. This paper applies amortised optimisation to the (hidden) local work group size parameter in the GPGPU module of OpenCV. With repetitive use of OpenCV features, the amortised optimisation will guide the user to the local work group size best suited for the combination of user's graphics processing unit and the given GPGPU task.
+		</p>
+		<h3>Full Results</h3>
+		<p>
+			Our objective is to reduce the execution time. We used getTickCount and getTickFrequency, which are provided by OpenCV, to calculate execution time for each matching process. We counted the number of clock cycles had been passed during matching process and divided the number of clock cycles by clock tick frequency. This gives us execution time in seconds.
+			
+		</p>
+		<p>
+			Boxplots show the results of 20 runs with OpenCV default setting, 80 runs with Amortised optimisation, and 20 runs with the best finding parameter values.
+		</p>
+		<p>
+			<table style="width:60%;">
+				<tr>
+                                        <td><a href="#plot01" class="inline">Pair 01</a></td>
+                                        <td><a href="#plot02" class="inline">Pair 02</a></td>
+                                        <td><a href="#plot03" class="inline">Pair 03</a></td>
+                                        <td><a href="#plot04" class="inline">Pair 04</a></td>
+                                        <td><a href="#plot05" class="inline">Pair 05</a></td>
+				</tr>
+                                <tr>
+                                        <td><a href="#plot06" class="inline">Pair 06</a></td>
+                                        <td><a href="#plot07" class="inline">Pair 07</a></td>
+                                        <td><a href="#plot08" class="inline">Pair 08</a></td>
+                                        <td><a href="#plot09" class="inline">Pair 09</a></td>
+                                        <td><a href="#plot10" class="inline">Pair 10</a></td>
+                                </tr>
+                                <tr>
+                                        <td><a href="#plot11" class="inline">Pair 11</a></td>
+                                        <td><a href="#plot12" class="inline">Pair 12</a></td>
+                                        <td><a href="#plot13" class="inline">Pair 13</a></td>
+                                        <td><a href="#plot14" class="inline">Pair 14</a></td>
+                                        <td><a href="#plot15" class="inline">Pair 15</a></td>
+				</tr>
+                                <tr>
+                                        <td><a href="#plot16" class="inline">Pair 16</a></td>
+                                        <td><a href="#plot17" class="inline">Pair 17</a></td>
+                                        <td><a href="#plot18" class="inline">Pair 18</a></td>
+                                        <td><a href="#plot19" class="inline">Pair 19</a></td>
+                                        <td><a href="#plot20" class="inline">Pair 20</a></td>
+                                </tr>
+			</table>
+		</p>
+		<p><a href="#plot_wgs" class="inline">Best work group size per test case plot</a></p>
+		
+                <div style="display:none">
+                        <div id="plot01" class="formula">
+                                <h2>Pair 01</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot01_table">Table</a></li>
+                                                <li><a href="#plot01_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot01_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot01_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot01_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_1.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot01_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot1.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot02" class="formula">
+                                <h2>Pair 02</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot02_table">Table</a></li>
+                                                <li><a href="#plot02_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot02_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot02_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot02_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_2.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot02_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot2.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot03" class="formula">
+                                <h2>Pair 03</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot03_table">Table</a></li>
+                                                <li><a href="#plot03_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot03_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot03_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot03_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_3.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot03_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot3.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot04" class="formula">
+				<h2>Pair 04</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot04_table">Table</a></li>
+                                                <li><a href="#plot04_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot04_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot04_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot04_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_4.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot04_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot4.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot05" class="formula">
+				<h2>Pair 05</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot05_table">Table</a></li>
+                                                <li><a href="#plot05_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot05_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot05_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot05_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_5.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot05_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot5.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot06" class="formula">
+				<h2>Pair 06</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot06_table">Table</a></li>
+                                                <li><a href="#plot06_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot06_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot06_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot06_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_6.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot06_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot6.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot07" class="formula">
+				<h2>Pair 07</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot07_table">Table</a></li>
+                                                <li><a href="#plot07_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot07_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot07_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot07_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_7.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot07_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot7.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot08" class="formula">
+				<h2>Pair 08</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot08_table">Table</a></li>
+                                                <li><a href="#plot08_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot08_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot08_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot08_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_8.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot08_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot8.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot09" class="formula">
+                                <h2>Pair 09</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot09_table">Table</a></li>
+                                                <li><a href="#plot09_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot09_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot09_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot09_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_9.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot09_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot9.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot10" class="formula">
+                                <h2>Pair 10</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot10_table">Table</a></li>
+                                                <li><a href="#plot10_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot10_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot10_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot10_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_10.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot10_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot10.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot11" class="formula">
+                                <h2>Pair 11</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot11_table">Table</a></li>
+                                                <li><a href="#plot11_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot11_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot11_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot11_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_11.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot11_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot11.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot12" class="formula">
+                                <h2>Pair 12</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot12_table">Table</a></li>
+                                                <li><a href="#plot12_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot12_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot12_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot12_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_12.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot12_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot12.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot13" class="formula">
+                                <h2>Pair 13</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot13_table">Table</a></li>
+                                                <li><a href="#plot13_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot13_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot13_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot13_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_13.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot13_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot13.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot14" class="formula">
+                                <h2>Pair 14</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot14_table">Table</a></li>
+                                                <li><a href="#plot14_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot14_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot14_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot14_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_14.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot14_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot14.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot15" class="formula">
+                                <h2>Pair 15</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot15_table">Table</a></li>
+                                                <li><a href="#plot15_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot15_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot15_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot15_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_15.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot15_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot15.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot16" class="formula">
+                                <h2>Pair 16</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot16_table">Table</a></li>
+                                                <li><a href="#plot16_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot16_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot16_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot16_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_16.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot16_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot16.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot17" class="formula">
+                                <h2>Pair 17</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot17_table">Table</a></li>
+                                                <li><a href="#plot17_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot17_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot17_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot17_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_17.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot17_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot17.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot18" class="formula">
+                                <h2>Pair 18</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot18_table">Table</a></li>
+                                                <li><a href="#plot18_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot18_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot18_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot18_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_18.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot18_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot18.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot19" class="formula">
+                                <h2>Pair 19</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot19_table">Table</a></li>
+                                                <li><a href="#plot19_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot19_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot19_table" class="results">
+                                                
+                                        </div>
+                                        <div id="plot19_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_19.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot19_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot19.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="plot20" class="formula">
+                                <h2>Pair 20</h2>
+                                <div class="tabs">
+                                        <ul>
+                                                <li><a href="#plot20_table">Table</a></li>
+                                                <li><a href="#plot20_graph1">Overall execution graph</a></li>
+                                                <li><a href="#plot20_graph2">Best work group size graph</a></li>
+                                        </ul>
+                                        <div id="plot20_table" class="results">
+
+                                        </div>
+                                        <div id="plot20_graph1" class="scatterplots">
+                                                <p><img src="plots/plot_20.png"  width="750"/></p>
+                                        </div>
+                                        <div id="plot20_graph2" class="scatterplots">
+                                                <p><img src="plots/best_wgs_scatter_plot20.png"  width="750"/></p>
+                                        </div>
+                                </div>
+                        </div>
+			<div id="plot_wgs" class="formula">
+				<h2>Best work group size per test case plot</h2>
+				<p><img src="plots/best_wgs_plot.png"  width="750"/></p>
+			</div>
+		</div>
+
+                <script src="http://d3js.org/d3.v3.min.js"></script>
+                <script type="text/javascript" charset="utf-8">
+                        function isNumeric(n) { return !isNaN(parseFloat(n)) && isFinite(n); }
+                        for(var i=1; i<20; i++){
+				(function (i) {
+	                                d3.text("plots/result/Case " + (i < 10 ? "0" : "") + i + ".csv", function(data) {
+        	                                var parsedCSV = d3.csv.parseRows(data);
+                        	                var container = d3.select("#plot" + (i < 10 ? "0" : "") + i + "_table")
+                                	                .append("table").attr("style", "border: 1px solid #000000; border-collapse: collapse; font-size:10pt;").attr("border", "1")
+                                        	        .selectAll("tr")
+                                                	        .data(parsedCSV).enter()
+                                                        	.append("tr")
+                	                               	.selectAll("td")
+                                                       		.data(function(d) { return d; }).enter()
+	                                                        .append("td").attr("style", "font-size:10px")
+        	                                                .text(function(d) { 
+                                                                        if(isNumeric(d)) return new Number(parseFloat(d)).toExponential(2);
+                                                                        else return d; }
+                                                                        );
+                                	});
+				} (i));
+                        }
+                </script>
+
+

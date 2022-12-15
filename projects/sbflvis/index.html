@@ -1,0 +1,459 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<title>SBFL Visualiser</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel=stylesheet href="css/base.css"/>
+	<script type="text/x-mathjax-config">
+	MathJax.Hub.Config({
+	  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+	});
+	</script>
+	<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head> 
+
+
+<body>
+
+<script src="scripts/three.min.js"></script>
+<script src="scripts/Detector.js"></script>
+<script src="scripts/info.js"></script>
+<script src="scripts/TrackballControls.js"></script>
+<script src="scripts/THREEx.KeyboardState.js"></script>
+<script src="scripts/THREEx.FullScreen.js"></script>
+<script src="scripts/THREEx.Geometry.js"></script>
+<script src="scripts/THREEx.WindowResize.js"></script>
+<script src="scripts/helvetiker_regular.typeface.js"></script>
+
+<script type='text/javascript' src='scripts/DAT.GUI.min.js'></script>
+
+<!-- http://silentmatt.com/javascript-expression-evaluator/ -->
+<script src="scripts/parser.js"></script>
+
+<!-- jQuery code to display an information button and box when clicked. -->
+<script src="scripts/jquery-1.9.1.js"></script>
+<script src="scripts/jquery-ui.js"></script>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+<script src="scripts/info.js"></script>
+
+<div id="infoButton"></div>
+<div id="infoBox" title="SBFL Visualisation">
+<h3>Background</h3>
+<p>
+	This tool visualises the risk value surface of any given Spectrum-Based Fault Localisation technique. The spectrum data for any structural element $s$ is usually summarised as a tuple $(e_f, n_f, e_p, n_p)$, where $e_f$ and $n_f$ are the number of failing test cases that covered or not covered $s$, and $e_p$ and $n_p$ are the number of passing test cases that covered or not covered $s$.
+</p>
+<p>
+	The intuition behind this visualisation is that, given a set of finished test results, the number of passing and failing test cases (i.e. $P$ and $F$) are fixed. This allows us to substitute $n_f$ with $F - e_f$ and $e_p$ with $P - n_p$, reducing the spectrum data tuple to a spectral coordinate, $(e_f, n_p)$. Consequently, any SBFL formula $R$ can be visualised by mapping the spectral coordinates, $(e_f, n_p)$, to the risk evaluation score, $R(e_f, n_p)$.
+</p>
+<p>
+	The visualisation also provides an intuitive short-hand for <a href="http://www0.cs.ucl.ac.uk/staff/s.yoo/papers/Yoo2014fv.pdf">the recent proof</a>, which showed that there is no greatest SBFL formula, i.e. the one that always outperforms all other formulas in Expense metric, regardless of the fault, program, and test suite. A faulty statement that can be localised by SBFL can have any coordinate $(e_f, n_p)$ as long as its $e_f$ equals $F$. However, without knowing the fault a priori, it is not possible for any formula to always map the coordinate of the faulty statement to the highest risk evaluation value. Hence no such formula can exist. For details of the proof, please refer to the following techreport:
+	<ul>
+	<li>S. Yoo, X. Xie, F.-C. Kuo, T. Y. Chen, and M. Harman. No pot of gold at the end of program spectrum rainbow: Greatest risk evaluation formula does not exist. Technical Report RN/14/14, University College London, 2014. <a href="http://www0.cs.ucl.ac.uk/staff/s.yoo/papers/Yoo2014fv.pdf">[PDF]</a> <a href="http://www0.cs.ucl.ac.uk/staff/s.yoo/papers/Yoo2014fv.bib">[BIB]</a></li>
+	</ul>
+</p>
+<h3>How to Use</h3>
+	<p>
+	Use the control pane to enter the formula you want to visualise. Spectrum elements are denoted by "ef", "nf", "ep", and "np" ("ep" and "nf" will be automatically replaced with "(P - np)" and "(F - ef)" when you click "Graph Function"). You can also use four parameters ("a", "b", "c", and "d"), whose values you can control through the pane to see the effect in real time. The risk evaluation score is normalised to $[0, 1]$ before visualisation. There are a set of pre-defined, existing formulas for your convenience. 
+	</p>
+	<p>
+	The 3D visualisation is rendered using <a href="http://threejs.org/">Three.js</a> and <a href="http://get.webgl.org/">WebGL</a>. We had the best performance with <a href="http://www.google.com/chrome/">Chrome</a> web browser.
+	</p>
+<h3>Credit</h3>	
+	This tool is based on the Three.js example from <a href="http://stemkoski.github.io/Three.js/">http://stemkoski.github.io/Three.js/</a>.
+</div>
+
+
+
+<!-- ------------------------------------------------------------ -->
+
+<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+<script>
+/*
+	Three.js "tutorials by example"
+	Author: Lee Stemkoski
+	Date: July 2013 (three.js v59dev)
+*/
+
+// MAIN
+
+// standard global variables
+var container, scene, camera, renderer, controls, stats;
+var keyboard = new THREEx.KeyboardState();
+var clock = new THREE.Clock();
+
+// custom global variables
+var gui, 
+	gui_zText, 
+	gui_F, 
+	gui_P,
+	gui_a, gui_b, gui_c, gui_d,
+	gui_segments;
+
+var zFuncText = "ef / F / (ef / F + ep / P)";
+var funcText = zFuncText.replace("ep", "(P - np)");
+funcText = funcText.replace("nf", "(F - ef)")
+var zFunc = Parser.parse(funcText).toJSFunction( ['ef','np'] );
+
+// parameters for the equations
+var a = 0.01, b = 0.01, c = 0.01, d = 0.01;
+
+var meshFunction;
+var segments = 1, P = 100.0, F = 100.0;
+	
+var graphGeometry;
+var gridMaterial, wireMaterial, vertexColorMaterial;
+var graphMesh;
+
+init();
+animate();
+
+// FUNCTIONS 		
+function init() 
+{
+	// SCENE
+	scene = new THREE.Scene();
+	// CAMERA
+	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+	scene.add(camera);
+	camera.position.set(-100, -100,400);
+	camera.lookAt(scene.position);
+
+	// RENDERER
+	if ( Detector.webgl )
+		renderer = new THREE.WebGLRenderer( {antialias:true} );
+	else
+		renderer = new THREE.CanvasRenderer(); 
+
+	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	container = document.getElementById( 'ThreeJS' );
+	container.appendChild( renderer.domElement );
+	// EVENTS
+	THREEx.WindowResize(renderer, camera);
+	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+	// CONTROLS
+	controls = new THREE.TrackballControls( camera, renderer.domElement );
+		
+	// LIGHT
+	var light = new THREE.PointLight(0xffffff);
+	light.position.set(0,250,0);
+	scene.add(light);
+	// SKYBOX/FOG
+	// scene.fog = new THREE.FogExp2( 0x888888, 0.00025 );
+	
+	////////////
+	// CUSTOM //
+	////////////
+	
+	// scene.add( new THREE.AxisHelper() );
+
+	// wireframe for xy-plane
+	var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000088, wireframe: true, side:THREE.DoubleSide } ); 
+	var floorGeometry = new THREE.PlaneGeometry(1000,1000,10,10);
+	var floor = new THREE.Mesh(floorGeometry, wireframeMaterial);
+	floor.position.z = -0.01;
+	
+	// rotate to lie in x-y plane
+	// floor.rotation.x = Math.PI / 2;
+	scene.add(floor);
+	
+	var normMaterial = new THREE.MeshNormalMaterial;
+	var shadeMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+	
+	// "wireframe texture"
+	var wireTexture = new THREE.ImageUtils.loadTexture( 'images/square.png' );
+	wireTexture.wrapS = wireTexture.wrapT = THREE.RepeatWrapping; 
+	wireTexture.repeat.set( 40, 40 );
+	wireMaterial = new THREE.MeshBasicMaterial( { map: wireTexture, vertexColors: THREE.VertexColors, side:THREE.DoubleSide} );
+
+	var vertexColorMaterial  = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+
+
+	// axis
+	var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+	var cubeMaterial = new THREE.MeshBasicMaterial( { map: wireTexture, vertexColors: THREE.VertexColors, side:THREE.DoubleSide } );
+	cubeMaterial.wireframe = true;
+	var cube = new THREE.Mesh( geometry, cubeMaterial );
+	cube.position.set(50, 50, 50);
+	scene.add( cube );
+
+	// create ef axis label
+	var canvas1 = document.createElement('canvas');
+	var context1 = canvas1.getContext('2d');
+	context1.font = "Bold 15px Arial";
+	context1.fillStyle = "rgba(255,255,255,0.95)";
+    context1.fillText('ef →', 0, 50);
+    
+	// canvas contents will be used for a texture
+	var texture1 = new THREE.Texture(canvas1) 
+	texture1.needsUpdate = true;
+      
+    var material1 = new THREE.MeshBasicMaterial( {map: texture1, side:THREE.DoubleSide } );
+    material1.transparent = true;
+
+    var mesh1 = new THREE.Mesh(
+        new THREE.PlaneGeometry(canvas1.width, canvas1.height),
+        material1
+      );
+	mesh1.position.set(175,-40,0);
+	scene.add( mesh1 );
+
+	// create np axis label
+	var canvas2 = document.createElement('canvas');
+	var context2 = canvas2.getContext('2d');
+	context2.font = "Bold 15px Arial";
+	context2.fillStyle = "rgba(255,255,255,0.95)";
+    context2.fillText('← np', 0, 50);
+    
+	// canvas contents will be used for a texture
+	var texture2 = new THREE.Texture(canvas2) 
+	texture2.needsUpdate = true;
+      
+    var material2 = new THREE.MeshBasicMaterial( {map: texture2, side:THREE.DoubleSide } );
+    material2.transparent = true;
+
+    var mesh2 = new THREE.Mesh(
+        new THREE.PlaneGeometry(canvas2.width, canvas2.height),
+        material2
+      );
+	mesh2.rotation.z = Math.PI * 1.5;
+	mesh2.position.set(-40, -60, 0);
+	scene.add( mesh2 );
+
+	// bgcolor
+	renderer.setClearColor( 0xaaaaaa, 1 );
+
+	///////////////////
+	//   GUI SETUP   //	
+	///////////////////
+
+	gui = new dat.GUI();
+	
+	parameters = 
+	{
+		resetCam:  function() { resetCamera(); },	
+		tarantula:   function() { tarantula(); },
+		naish2: function() {naish2();},
+		jaccard: function() {jaccard();},
+		ochiai: function() {ochiai();},
+		gp13: function() {gp13();},
+		graphFunc: function() { createGraph(); },
+		finalValue: 337
+	};
+
+	// GUI -- equation
+	gui_zText = gui.add( this, 'zFuncText' ).name('R(ef,np) = ');
+	gui_P = gui.add(this, 'P' ).name('P = ');
+	gui_F = gui.add(this, 'F' ).name('F = ');
+	gui_segments = gui.add( this, 'segments' ).name('Subdivisions = ');
+
+	// GUI -- parameters
+	var gui_parameters = gui.addFolder('Parameters');
+	a = b = c = d = 1;
+	gui_a = gui_parameters.add( this, 'a' ).min(-100).max(100).step(1).name('a = ');
+	gui_a.onChange( function(value) { createGraph(); } );
+	gui_b = gui_parameters.add( this, 'b' ).min(-100).max(100).step(1).name('b = ');
+	gui_b.onChange( function(value) { createGraph(); } );
+	gui_c = gui_parameters.add( this, 'c' ).min(-100).max(100).step(2).name('c = ');
+	gui_c.onChange( function(value) { createGraph(); } );
+	gui_d = gui_parameters.add( this, 'd' ).min(-100).max(100).step(2).name('d = ');
+	gui_d.onChange( function(value) { createGraph(); } );
+	gui_a.setValue(1);
+	gui_b.setValue(1);
+	gui_c.setValue(1);
+	gui_d.setValue(1);
+
+	// GUI -- preset equations
+	var gui_preset = gui.addFolder('Preset Formulas');
+	gui_preset.add( parameters, 'tarantula' ).name('Tarantula');
+	gui_preset.add( parameters, 'jaccard' ).name('Jaccard');
+	gui_preset.add( parameters, 'ochiai' ).name('Ochiai');
+	gui_preset.add( parameters, 'naish2' ).name('Naish2');
+	gui_preset.add( parameters, 'gp13' ).name('GP13');
+
+	gui.add( parameters, 'resetCam' ).name("Reset Camera");
+	gui.add( parameters, 'graphFunc' ).name("Graph Function");	
+
+	tarantula();
+}
+
+function createGraph()
+{
+	// xRange = xMax - xMin;
+	// yRange = yMax - yMin;
+	// zFunc = Parser.parse(zFuncText).toJSFunction( ['x','y'] );
+
+	// xRange = xMax - xMin;
+	// yRange = yMax - yMin;
+	funcText = zFuncText.replace("ep", "(P - np)");
+	funcText = funcText.replace("nf", "(F - ef)")
+	zFunc = Parser.parse(funcText).toJSFunction( ['ef','np'] );
+
+	meshFunction = function(x, y) 
+	{
+		x = F * x;
+		y = P * y;
+
+		var z = zFunc(x,y); //= Math.cos(x) * Math.sqrt(y);
+		if ( isNaN(z) )
+			return new THREE.Vector3(0,0,0); // TODO: better fix
+		else
+			return new THREE.Vector3(x, y, z);
+	};
+	
+	// true => sensible image tile repeat...
+	graphGeometry = new THREE.ParametricGeometry( meshFunction, segments, segments, true );
+	
+	///////////////////////////////////////////////
+	// calculate vertex colors based on Z values //
+	///////////////////////////////////////////////
+	graphGeometry.computeBoundingBox();
+	zMin = graphGeometry.boundingBox.min.z;
+	zMax = graphGeometry.boundingBox.max.z;
+	zRange = zMax - zMin;
+
+	var color, point, face, numberOfSides, vertexIndex;
+	// faces are indexed using characters
+	var faceIndices = [ 'a', 'b', 'c', 'd' ];
+	// first, assign colors to vertices as desired
+	for ( var i = 0; i < graphGeometry.vertices.length; i++ ) 
+	{
+		point = graphGeometry.vertices[ i ];
+		color = new THREE.Color( 0x0000ff );
+		color.setHSL( 0.7 * (zMax - point.z) / zRange, 1, 0.5 );
+		graphGeometry.colors[i] = color; // use this array for convenience
+	}
+	// copy the colors as necessary to the face's vertexColors array.
+	for ( var i = 0; i < graphGeometry.faces.length; i++ ) 
+	{
+		face = graphGeometry.faces[ i ];
+		numberOfSides = ( face instanceof THREE.Face3 ) ? 3 : 4;
+		for( var j = 0; j < numberOfSides; j++ ) 
+		{
+			vertexIndex = face[ faceIndices[ j ] ];
+			face.vertexColors[ j ] = graphGeometry.colors[ vertexIndex ];
+		}
+	}
+
+	for ( var i = 0; i < graphGeometry.vertices.length; i++ ) 
+	{
+		graphGeometry.vertices[i].z = graphGeometry.vertices[i].z * 100 / zRange;
+	}
+	///////////////////////
+	// end vertex colors //
+	///////////////////////
+	
+	// material choices: vertexColorMaterial, wireMaterial , normMaterial , shadeMaterial
+	
+	if (graphMesh) 
+	{
+		scene.remove( graphMesh );
+		// renderer.deallocateObject( graphMesh );
+	}
+
+	wireMaterial.map.repeat.set( segments, segments );
+	
+	graphMesh = new THREE.Mesh( graphGeometry, wireMaterial );
+	graphMesh.doubleSided = true;
+	scene.add(graphMesh);
+}
+
+function tarantula()
+{
+	gui_zText.setValue("ef / F / (ef / F + ep / P)");
+	
+	gui_a.setValue(1);
+	gui_b.setValue(1);
+	gui_segments.setValue(10);
+	createGraph(); 
+	resetCamera();
+}
+
+function naish2()
+{
+
+	gui_zText.setValue("ef - (P - np) / (P + a)");
+	gui_a.setValue(1);
+	gui_b.setValue(1);
+	gui_segments.setValue(10);
+	createGraph(); 
+	resetCamera();
+}
+
+function jaccard()
+{
+
+	gui_zText.setValue("ef / (ef + F - ef + P - np)");
+	gui_a.setValue(1);
+	gui_b.setValue(1);
+	gui_segments.setValue(10);
+	createGraph(); 
+	resetCamera();
+}
+
+function ochiai()
+{
+
+	gui_zText.setValue("ef / sqrt((ef + F - ef) * (ef + P - np))");
+	gui_a.setValue(1);
+	gui_b.setValue(1);
+	gui_segments.setValue(10);
+	createGraph(); 
+	resetCamera();
+}
+
+function gp13()
+{
+
+	gui_zText.setValue("ef * (a + b / (c * (P - np) + ef))");
+	gui_a.setValue(1);
+	gui_b.setValue(1);
+	gui_segments.setValue(10);
+	createGraph(); 
+	resetCamera();
+}
+		
+function resetCamera()
+{
+	// CAMERA
+	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	var VIEW_ANGLE = 60, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+	camera.position.set( - 2 * F, - 0.5 * P, 200);
+	camera.up = new THREE.Vector3( 0, 0, 2 );
+	camera.lookAt(scene.position);	
+	scene.add(camera);
+	
+	controls = new THREE.TrackballControls( camera, renderer.domElement );
+	THREEx.WindowResize(renderer, camera);
+}
+
+function animate() 
+{
+    requestAnimationFrame( animate );
+	render();		
+	update();
+}
+
+function update()
+{
+	if ( keyboard.pressed("z") ) 
+	{ 
+		// do something
+	}
+	controls.update();
+}
+
+function render() 
+{
+	renderer.render( scene, camera );
+}
+
+</script>
+
+</body>
+</html>

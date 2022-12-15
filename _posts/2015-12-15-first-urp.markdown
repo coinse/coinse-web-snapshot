@@ -1,0 +1,14 @@
+---
+layout: post
+title:  "First URP (Undergraduate Research Participation) Project"
+date:   2015-12-15 13:27:00 +0900
+author: Shin Yoo
+categories: coinse
+excerpt: COINSE has its first URP proposal approved. It is about using Monte Carlo Tree Search for program synthesis.
+---
+One of the many nice programmes run by KAIST is the [URP: Undergraduate Research Participation][urp]. Under URP, undergraudate students can spend from 6 months up to 1 year in research labs (normally populated with graduate students) to persue a specific research agenda.
+
+I'm happy to report that COINSE has its first URP proposal approved. Jinsuk Lim, a double major in math and CS, will be joining the lab to further evaluate the idea of using Monte Carlo Tree Search for stochastic program synthesis, following the work David White and I did for [GECCO 2015][gecco-paper]. Well done, Jinsuk :)
+
+[gecco-paper]: http://dl.acm.org/ft_gateway.cfm?ftid=1604575&id=2764655
+[urp]: http://kchannel.kaist.ac.kr/CH751-000
